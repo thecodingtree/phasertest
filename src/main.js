@@ -10,6 +10,7 @@ const initialState = {
   isRunningRight: false,
   isSliding: false,
   isJumping: false,
+  isTouchingGround: false,
 }
 
 function boyReducer(state = initialState, action) {
@@ -23,13 +24,17 @@ function boyReducer(state = initialState, action) {
     case 'BOY/RUNNING_LEFT_STOP':
       return { ...state, isRunningLeft: false };
     case 'BOY/JUMPING_START':
-      return { ...state, isJumping: true };
+      return { ...state, isJumping: true};
     case 'BOY/JUMPING_STOP':
       return { ...state, isJumping: false };
-      case 'BOY/SLIDING_START':
-          return { ...state, isSliding: true };
-        case 'BOY/SLIDING_STOP':
-          return { ...state, isSliding: false };
+    case 'BOY/SLIDING_START':
+      return { ...state, isSliding: true };
+    case 'BOY/SLIDING_STOP':
+      return { ...state, isSliding: false };
+    case 'BOY/LEFT_GROUND':
+      return {...state, isTouchingGround: false};
+    case 'BOY/COLLIDED_WITH_GROUND':
+      return { ...state, isTouchingGround: true };
     default:
       return state;
   }
@@ -41,6 +46,12 @@ const config = {
   width: 1024,
   height: 768,
   type: Phaser.AUTO,
+  physics: {
+    default: "matter",
+    matter: {
+        debug: true
+    }
+}
 }
 
 const game = new Phaser.Game(config);

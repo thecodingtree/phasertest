@@ -2,19 +2,27 @@ import Phaser from 'phaser';
 
 import { store } from '../main';
 
-export default class Boy extends Phaser.GameObjects.Sprite {
+export default class Boy {
 
   constructor(config) {
-    super(config.scene, config.x, config.y, 'boy');
+    //super(config.scene, config.x, config.y, 'boy');
 
     this.handleStateChg = this.handleStateChg.bind(this);
 
     this.createAnimations(config.scene.anims);
     this.createInputs(config.scene.input);
 
-    config.scene.add.existing(this);
+    this.boyMatter = config.scene.matter.add.sprite(config.x, config.y, 'boy');
 
-    this.play('boy_idle');
+    this.boyMatter.play('boy_idle');
+    this.boyMatter.setFixedRotation();
+
+    // FIX ME: make this more robust
+    this.boyMatter.setOnCollide((data) => {
+      store.dispatch({ type: 'BOY/COLLIDED_WITH_GROUND' });
+    })
+
+    return this.boyMatter;
 
   }
 
@@ -135,23 +143,32 @@ export default class Boy extends Phaser.GameObjects.Sprite {
 
   handleStateChg() {
 
+    const boy = this.boyMatter;
     // DEBUG
     console.log(store.getState());
 
-    const { isRunningLeft, isRunningRight, isJumping, isSliding } = store.getState();
+    const { isRunningLeft, isRunningRight, isJumping, isSliding, isTouchingGround } = store.getState();
 
     if (isRunningLeft) {
-      this.flipX = true;
-      this.play('boy_run');
-    } else if (isRunningRight) {
-      this.flipX = false;
-      this.play('boy_run');
-    } else if (isSliding) {
-      this.play('boy_slide');
-    } else if (isJumping) {
-      this.play('boy_jump');
-    } else {
-      this.play('boy_idle');
+      boy.flipX = true;
+      boy.play('boy_run');
+    }
+
+    if (isRunningRight) {
+      boy.flipX = false;
+      boy.play('boy_run', true);
+    }
+
+    if (isSliding) {
+      boy.play('boy_slide');
+    }
+
+    if (isJumping && isTouchingGround) {
+      boy.play('boy_jump', true);
+    }
+
+    if (!(isRunningRight || isRunningLeft || isSliding || isJumping)) {
+      boy.play('boy_idle');
     }
 
   }
