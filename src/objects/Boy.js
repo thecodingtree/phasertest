@@ -2,11 +2,22 @@ import Phaser from 'phaser';
 
 import { store } from '../main';
 
+import {
+  MOVING_RIGHT_START,
+  MOVING_RIGHT_STOP,
+  MOVING_LEFT_START,
+  MOVING_LEFT_STOP,
+  JUMPING_START,
+  JUMPING_STOP,
+  SLIDING_START,
+  SLIDING_STOP,
+  LEFT_GROUND,
+  COLLIDED_WITH_GROUND,
+} from '../redux/actions/boy';
+
 export default class Boy {
 
   constructor(config) {
-    //super(config.scene, config.x, config.y, 'boy');
-
     this.handleStateChg = this.handleStateChg.bind(this);
 
     this.createAnimations(config.scene.anims);
@@ -19,7 +30,11 @@ export default class Boy {
 
     // FIX ME: make this more robust
     this.boyMatter.setOnCollide((data) => {
-      store.dispatch({ type: 'BOY/COLLIDED_WITH_GROUND' });
+      const { isTouchingGround } = store.getState();
+
+      if (!isTouchingGround) {
+        store.dispatch({ type: COLLIDED_WITH_GROUND });
+      }
     })
 
     return this.boyMatter;
@@ -38,35 +53,35 @@ export default class Boy {
     }
 
     this.keysObj.right.on('down', () => {
-      store.dispatch({ type: 'BOY/RUNNING_RIGHT_START' })
+      store.dispatch({ type: MOVING_RIGHT_START })
     });
 
     this.keysObj.right.on('up', () => {
-      store.dispatch({ type: 'BOY/RUNNING_RIGHT_STOP' })
+      store.dispatch({ type: MOVING_RIGHT_STOP })
     });
 
     this.keysObj.left.on('down', () => {
-      store.dispatch({ type: 'BOY/RUNNING_LEFT_START' })
+      store.dispatch({ type: MOVING_LEFT_START })
     });
 
     this.keysObj.left.on('up', () => {
-      store.dispatch({ type: 'BOY/RUNNING_LEFT_STOP' })
+      store.dispatch({ type: MOVING_LEFT_STOP })
     });
 
     this.keysObj.down.on('down', () => {
-      store.dispatch({ type: 'BOY/SLIDING_START' })
+      store.dispatch({ type: SLIDING_START })
     });
 
     this.keysObj.down.on('up', () => {
-      store.dispatch({ type: 'BOY/SLIDING_STOP' })
+      store.dispatch({ type: SLIDING_STOP })
     });
 
     this.keysObj.space.on('down', () => {
-      store.dispatch({ type: 'BOY/JUMPING_START' })
+      store.dispatch({ type: JUMPING_START })
     });
 
     this.keysObj.space.on('up', () => {
-      store.dispatch({ type: 'BOY/JUMPING_STOP' })
+      store.dispatch({ type: JUMPING_STOP })
     });
   }
 

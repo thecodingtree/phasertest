@@ -3,47 +3,20 @@ import Phaser from 'phaser';
 import TitleScreen from './scenes/TitleScreen';
 import Game from './scenes/Game';
 
-import { createStore } from 'redux';
+import { createStore, compose } from 'redux';
 
-const initialState = {
-  isRunningLeft: false,
-  isRunningRight: false,
-  isSliding: false,
-  isJumping: false,
-  isTouchingGround: false,
-}
+import { default as boyReducer } from './redux/reducers/boy';
 
-function boyReducer(state = initialState, action) {
-  switch (action.type) {
-    case 'BOY/RUNNING_RIGHT_START':
-      return { ...state, isRunningRight: true };
-    case 'BOY/RUNNING_RIGHT_STOP':
-      return { ...state, isRunningRight: false };
-    case 'BOY/RUNNING_LEFT_START':
-      return { ...state, isRunningLeft: true };
-    case 'BOY/RUNNING_LEFT_STOP':
-      return { ...state, isRunningLeft: false };
-    case 'BOY/JUMPING_START':
-      return { ...state, isJumping: true};
-    case 'BOY/JUMPING_STOP':
-      return { ...state, isJumping: false };
-    case 'BOY/SLIDING_START':
-      return { ...state, isSliding: true };
-    case 'BOY/SLIDING_STOP':
-      return { ...state, isSliding: false };
-    case 'BOY/LEFT_GROUND':
-      return {...state, isTouchingGround: false};
-    case 'BOY/COLLIDED_WITH_GROUND':
-      return { ...state, isTouchingGround: true };
-    default:
-      return state;
-  }
-}
 
-export const store = createStore(boyReducer);
+const composeEnhancers = (process.env.NODE_ENV === 'development' ?
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null) || compose;
+
+const enhancers = composeEnhancers();
+
+export const store = createStore(boyReducer, enhancers);
 
 const config = {
-  width: 1024,
+  width: 1600,
   height: 768,
   type: Phaser.AUTO,
   physics: {
